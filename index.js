@@ -65,19 +65,23 @@ module.exports = {
   },
   createClient: async function(options) {
     if(options.uri) {
-      var pattern = /^((mqtt[s]?|ws[s]?)?:(\/\/)([0-9a-zA-Z_\.]*):?(\d+))$/;
+      var pattern = /^(((mqtt[s]?|ws[s]?)?:(\/\/)([0-9a-zA-Z_\.]*):?([a-zA-Z0-9._-]*))@([0-9a-zA-Z_\.]*):?(\d+))$/;
       var matches = options.uri.match(pattern);
       if (!matches) {
-        throw new Error(`Uri passed to createClient ${options.uri} doesn't match a known protocol (mqtt:// or ws://).`);
+        throw new Error(`Uri passed to createClient ${options.uri} doesn't match a known pattern ([mqtt:// or ws://]username:password@host:port).`);
       }
-      var protocol = matches[2];
-      var host = matches[4];
-      var port =  matches[5];
+
+      var protocol = matches[3];
+      var user = matches[5];
+      var pass = matches[6];
+      var host = matches[7];
+      var port = matches[8];
 
       options.port = parseInt(port);
       options.host = host;
       options.protocol = 'tcp';
-
+      options.user = user;
+      options.password = pass;
 
       if(protocol == 'wss' || protocol == 'mqtts') {
         options.tls = true;
